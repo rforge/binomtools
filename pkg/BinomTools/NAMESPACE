@@ -1,0 +1,7 @@
+export(halfnorm)
+export(exLikResid)
+export(resBin)
+
+# S3method(method, class)
+
+# importFrom(package_name, function_name)
