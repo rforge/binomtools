@@ -8,5 +8,5 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: The BinomTools package provides a collection of
   diagnostic methods for binomial regression models. To be
   elaborated... 
-License: GPL (>= 2) # Should it be (>=3)?
+License: GPL (>= 3)
 LazyLoad: yes
