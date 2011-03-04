@@ -5,7 +5,7 @@
   Function to derive exact values of deletion (leave-one-out)
   residuals for logistic regression models}
 \usage{
-  exLikResid(object)
+exLikResid(object)
 }
 \arguments{
   \item{object}{An object of class \code{glm} with a binomial family}
@@ -29,8 +29,7 @@
   residuals and, accordingly, care must be exercised in order to avoid
   confusion of the different residual types.   
 }
-\value{
-  A vector with exact deletion residuals
+\value{A vector with exact deletion residuals}
 \references{
   Collett, D. (2003) \emph{Modelling binary data}. Second
   edition. Chapman & Hall/CRC. 
@@ -42,14 +41,13 @@
   deviance and single case deletions. \emph{Applied Statistics}
   \bold{36}, 181-191. 
 }
-\author{
-  Merete Kjær Hansen
-}
+\author{Merete K Hansen}
 \seealso{
-  \code{\link[stats]{rstudent}}, \code{\link[BinomTools]{resType}}
+  \code{\link[stats]{rstudent}}, \code{\link[BinomTools]{resBin}}
 }
 \examples{
-  beetles.glm <- glm(cbind(y, n-y) ~ log(dose), family=binomial, data=beetles)
-  exLikResid(beetles.glm)
+data(beetles)
+beetles.glm <- glm(cbind(y, n-y) ~ log(conc), family=binomial, data=beetles)
+exLikResid(beetles.glm)
 }
 \keyword{ models }

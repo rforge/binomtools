@@ -1,5 +1,5 @@
 \name{serum}
-\alias{Serum}
+\alias{serum}
 \docType{data}
 \title{Anti-pneumococcus serum}
 \description{

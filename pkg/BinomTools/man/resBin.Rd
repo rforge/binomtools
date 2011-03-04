@@ -4,11 +4,12 @@
 \description{
   Function to derive residuals from a logistic regression model} 
 \usage{
-  resBin(object, type = c("deviance", "aLik", "eLik", "pearson"))
+resBin(object, type = c("deviance", "aLik", "eLik", "pearson"))
 }
 \arguments{
   \item{object}{An object of class \code{glm} with a binomial family}
-  \item{type}{The type of residuals that should be returned}}
+  \item{type}{The type of residuals that should be returned}
+}
 \details{
   The \code{deviance} residuals are the standardized deviance residuals
   from \code{\link[stats]{rstandard}}. The approximated likelihood
@@ -16,8 +17,9 @@
   exact likelihood residuals (\code{eLik}) from
   \code{\link[BinomTools]{exLikResid}}. The \code{pearson} residuals are
   standardized pearson residuals and are calculated dividing the pearson
-  residuals (obtained from \code{\link[]{resid}}) by
-  \eqn{sqrt(1-\code{\link[stats]{hatvalues}})}.
+  residuals (obtained from \code{\link[stats]{residuals}}) by
+  \eqn{sqrt(1-h_i)} (\eqn{h_i} can be extracted with
+  \code{\link[stats]{hatvalues}}).
 }
 \value{A vector of residuals}
 \references{ 
@@ -30,13 +32,11 @@
   Williams, D. A. (1987) Generalized linear model diagnostics using the
   deviance and single case deletions. \emph{Applied Statistics}
   \bold{36}, 181-191. 
-  }
-\author{
-Merete Kjær Hansen
 }
+\author{Merete K Hansen}
 \examples{
-  serum.glm <- glm(cbind(y, n-y) ~ log(dose), family=binomial,
-    data=serum)
-  resBin(serum.glm)
+data(serum)
+serum.glm <- glm(cbind(y, n-y) ~ log(dose), family = binomial, data = serum)
+resBin(serum.glm, type='deviance')
 }
 \keyword{ models }
