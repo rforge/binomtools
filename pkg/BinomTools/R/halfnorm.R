@@ -22,7 +22,9 @@ halfnormEnv <- function(object, resType, nsim)
     groupSize <- apply(mr, 1, sum)
     if(!is.null(model.weights(mf))) mw <- model.weights(mf)
     else mw <- rep(1, nrow(mf))
-    call <- update(object, formula=YY ~ ., data = simData, weights = mw, evaluate = F)
+    start <- coef(object)
+    call <- update(object, formula=YY ~ ., data = simData, weights =
+    mw, evaluate = F, start=start)
 
     ## Simulation of data
     simData <- object$model
