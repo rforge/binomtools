@@ -1,15 +1,10 @@
-# Data and model
-Serum <- read.table('Data/Anti-pneumococcus serum.dat', header=T)
-Serum.glm <- glm(cbind(y, n-y) ~ dose, family=binomial, data=Serum)
-Serumlog.glm <- glm(cbind(y, n-y) ~ log(dose), family=binomial, data=Serum)
-Serum.gau.glm <- glm(y ~ dose, family=gaussian, data=Serum)
 
-
-## Bedre navn til funktion???
-profBin <- function(object, which.par, alpha = 0.05, max.steps = 50,
+profBin <- function(object, which.par, alpha = 0.001, max.steps = 50,
                nsteps = 8, step.warn = 5, trace = F, ...)
 {
   ## Match and test input arguments
+  call <- match.call()
+  name.object <- call$object # Name of original fitted object
   if(!any(class(object) == 'glm'))
     stop("Object must be of class glm")
   if(family(object)$family != 'binomial')
@@ -25,6 +20,7 @@ profBin <- function(object, which.par, alpha = 0.05, max.steps = 50,
   step.warn <- round(step.warn)
   trace <- as.logical(trace)[1]
   ## Misc extraction from object
+  call.object <- object$call # Original call
   mf <- model.frame(object)
   X <- model.matrix(object)
   y <- model.response(mf)
@@ -54,7 +50,7 @@ profBin <- function(object, which.par, alpha = 0.05, max.steps = 50,
   ## Step length
   delta <- lroot.max / nsteps
   ## Result list
-  prof.list <- vector('list', length=length(pnames[which.par]))
+  prof.list <- vector('list', length=length(which.par))
   names(prof.list) <- pnames[which.par]
   ## for each which.par move down and then up (from MLE), fit model
   ## with 'wp' fixed at ascending/descending values (using offset) and
@@ -115,26 +111,103 @@ profBin <- function(object, which.par, alpha = 0.05, max.steps = 50,
 ###              "  so profile may be unreliable for ", wb.name)
     
   } ## end 'for wp in which.par'
-  val <- structure(prof.list, summary.originalfit = summary(object)) 
+  val <- structure(prof.list, summary.originalfit = summary(object),
+  name.originalfit = name.object, call.originalfit = call.object) 
   class(val) <- c('profBin.glm')
   return(val)
 }
-profBin(Serum.glm, trace=T)
+pr1 <- profBin(Serum.glm)
+pr1
 
 
-## To-do next: confint og plot
+
+#######################
+## Plot of profile likelihood
+#######################
+# plot.profBin.glm - senere navn?
+aa <- function(x, which.par, statistic = c("likelihood", "lroot"),
+                             log = TRUE, approx = TRUE,
+                             conf.int = TRUE, level = 0.95,
+                             fig = TRUE)
+                             # flere senere: n = ???, ylim = ...?, ...) 
+{  
+  ## Match and test arguments
+  xnames <- names(x)
+  if(missing(which.par)) which.par <- seq_along(xnames)
+#  if(...) warning('should be character or numeric vector')
+  if(is.character(which.par)) which.par <- match(which.par, xnames, 0)
+#  if(!all...match...) warning('nogle matcher ikke')
+#  if(which.par == 0) stop('ingen parametre matcher')
+  p <- length(which.par)
+  statistic <- match.arg(statistic)
+  ## Misch extraction from original glm object
+  orig.fit <- attr(x, 'summary.originalfit')
+  name.originalfit <- attr(x, 'name.originalfit')
+  call.originalfit <- attr(x, 'call.originalfit') 
+  b0 <- coef(orig.fit)[, 'Estimate']
+  std.err <- coef(orig.fit)[, 'Std. Error'] # brug vcov i stedet for
+  ## Result list
+  res.list <- c(name.originalfit, call.originalfit, vector('list', length=p))
+  names(res.list) <- c('name.originalfit', 'call.originalfit', xnames[which.par])
+  ## If values are plotted a device is opened
+  if(fig) {
+    rows <- ceiling(sqrt(p))
+    op <- par(mfrow=c(rows, rows), oma = c(0,0,2,0))
+    on.exit(par(op))
+  } 
+  ## For each wp calculate requisite values and plot them  
+  for(wp in which.par) {
+    par.wp <- x[[wp]]$par.values
+    lik.wp <- x[[wp]]$lroot
+    spline.wp <- spline(par.wp, lik.wp) # husk tilføj n=n
+    wp.name <- xnames[wp]
+    if(approx) approx.wp <- (par.wp - b0[wp.name])/std.err[wp.name]
+### byttes om på par.wp og b0?
+    if(conf.int) cutoff.wp <- qnorm((1-level)/2, lower.tail = F) 
+    if(statistic == 'lroot') {
+      ylab <- "Profile likelihood root"
+      if(conf.int) cutoff.wp <- c(-1, 1) * cutoff.wp
+    } ## end 'if statistic is lroot'
+    else if(statistic == 'likelihood') {
+      ylab <- "Profile log-likelihood"
+      spline.wp$y <- -spline.wp$y^2/2
+      if(approx) approx.wp <- -approx.wp^2/2
+      if(conf.int) cutoff.wp <- -cutoff.wp^2/2
+      if(!log)
+        ylab <- "Profile likelihood"
+        spline.wp$y <- exp(spline.wp$y)
+        if(approx) approx.wp <- exp(approx.wp)
+        if(conf.int) cutoff.wp <- exp(cutoff.wp)
+    } ## end 'if statistic is likelihood'
+    else
+      stop("Type of statistic not recognized. Supported arguments are 'likelihood' and 'lroot'")  
+    res.list[[wp.name]]$spline.vals <- spline.wp
+    if(approx) res.list[[wp.name]]$approx.vals <- list(x = par.wp,
+                  y = approx.wp) 
+    if(conf.int) res.list[[wp.name]]$cutoff <- cutoff.wp
+
+    if(fig) {
+      plot(spline.wp$x, spline.wp$y, type='l', xlab=wp.name,
+      ylab=ylab, col='black')
+      if(statistic=='lroot') points(b0[wp.name], 0, pch=18)
+      if(conf.int) abline(h = cutoff.wp)
+      if(approx) {
+        lines(par.wp, approx.wp, lty=2, col='steelblue')
+        legend('topleft', legend=c(statistic, 'approx'), lty = 1:2,
+        col=c('black','steelblue'), bty = 'n')
+      }
+      title(paste("\nProfile likelihood of parameter
+      estimates from object '", name.originalfit, "'", sep=""), outer=T)
+    } ## end 'if fig = T draw plot for each wp'
+  } ## end 'for wp in which.par calculate values needed for plotting'
+#    attr(spline.list, '')
+    if(fig) invisible(res.list)
+    else return(res.list)
+}
+
+cc <- aa(pr1, statistic='lik', conf.int=T, approx=T)
+cc
 
 
-  
-# To consider...
-# Hvad med dispersion parameter i originalt fit?
-# profile deviance?
-# restriktioner på link-typen??
-
-
-# Options plot
-# - likelihood eller likelihood root statistic
-# - absolut eller relativ scale
-# - indtegne kvadratisk approximation
 
 
