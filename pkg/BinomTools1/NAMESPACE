@@ -1,0 +1,16 @@
+export(halfnorm, exLikResid, resBin, empLogit, group, HLtest, Rsq,
+       X2GOFtest)
+
+# S3method(method, class)
+S3method(group, glm)
+S3method(HLtest, Rsq)
+S3method(plot, Rsq)
+S3method(print, HLtest.Rsq)
+S3method(print, Rsq)
+S3method(print, X2GOFtest.Rsq)
+S3method(Rsq, glm)
+S3method(X2GOFtest, Rsq)
+
+
+# importFrom(package_name, function_name)
+importFrom(graphics, plot)

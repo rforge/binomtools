@@ -1,0 +1,12 @@
+Package: binomTools
+Type: Package
+Title: Diagnostics and characterization of binomial regression models
+Version: 1.0-1
+Date: 2011-03-22
+Author: Rune Haubo B Christensen and Merete K Hansen
+Maintainer: Merete K Hansen <mkh@imm.dtu.dk>
+Description: The BinomTools package provides a collection of
+  diagnostic methods for binomial regression models. To be
+  elaborated... 
+License: GPL (>= 3)
+LazyLoad: yes
