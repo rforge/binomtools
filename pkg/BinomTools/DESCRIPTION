@@ -1,4 +1,4 @@
-Package: BinomTools
+Package: binomTools
 Type: Package
 Title: Diagnostics and characterization of binomial regression models
 Version: 1.0-1
