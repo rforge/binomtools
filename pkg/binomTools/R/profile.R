@@ -1,25 +1,28 @@
-profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
+
+
+profile.glm <- function(fitted, which.par, alpha = 0.005, max.steps = 50,
                nsteps = 8, step.warn = 5, trace = F, ...)
 {
   ## Match and test input arguments
   call <- match.call()
-  name.object <- call$object # Name of original fitted object
-  if(!any(class(object) == 'glm'))
-    stop("Object must be of class glm")
-  if(family(object)$family != 'binomial')
-    stop("GLM object must be fitted with the binomial family")
+  name.fitted <- call$fitted # Name of original fitted object
+  if(!any(class(fitted) == 'glm'))
+    stop("Argument 'fitted' must be of class glm")
+  if(family(fitted)$family != 'binomial')
+    stop("GLM must be fitted with the binomial family")
   stopifnot(is.numeric(alpha) && length(alpha) == 1 &&
             alpha > 0 && alpha < 1)
   stopifnot(round(max.steps) > round(nsteps))
+  stopifnot(round(nsteps) > round(step.warn))
   stopifnot(round(nsteps) > 0 && round(step.warn) >= 0)
   max.steps <- round(max.steps)
   nsteps <- round(nsteps)
   step.warn <- round(step.warn)
   trace <- as.logical(trace)[1]
-  ## Misc extraction from object
-  call.object <- object$call # Original call
-  mf <- model.frame(object)
-  X <- model.matrix(object)
+  ## Misc extraction from 'fitted'
+  call.fitted <- fitted$call # Original call
+  mf <- model.frame(fitted)
+  X <- model.matrix(fitted)
   y <- model.response(mf)
   n <- length(y)
   if(!is.null(dim(y))) n <- n/2
@@ -27,7 +30,7 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
   else w <- rep(1, n)
   if(!is.null(model.offset(mf))) o <- model.offset(mf)
   else o <- rep(0, n)
-  p <- length(pnames <- names(b0 <- coef(object)))
+  p <- length(pnames <- names(b0 <- coef(fitted)))
   na.par <- is.na(b0)
   if(missing(which.par)) which.par <- 1:p
   if(!is.numeric(which.par) && !is.character(which.par))
@@ -42,10 +45,10 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
   if(any(is.na(which.par)))
     stop("Invalid parameter argument(s) in 'which.par'")
   stopifnot(length(which.par) > 0)
-  std.err <- sqrt(diag(vcov(object)))
-  orig.dev <- deviance(object)
-  lLik <- logLik(object)
-  fam <- family(object)
+  std.err <- sqrt(diag(vcov(fitted)))
+  orig.dev <- deviance(fitted)
+  lLik <- logLik(fitted)
+  fam <- family(fitted)
   ## Profile limit
   lroot.max <- qnorm(1 - alpha/2)
   ## Step length
@@ -73,28 +76,28 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
       }
       step <- 0
       lroot <- 0
-      start <- b0[!skip.wp]
+      etastart <- X[, !na.par, drop = FALSE] %*% b0[!na.par] + o
       ## Increment wp (using offset) and refit model until threshold is
       ## reached 
       while(step < max.steps && abs(lroot) <= lroot.max) {
         step <- step + 1
         bi <- b0[wp] + direction * step * delta * std.err[wp.name]
         oi <- as.vector(o + X[, wp] * bi)
-        fm <- glm.fit(x = X.wp, y = y, weights = w, start = start,
-                      offset = oi, family = fam, control = object$control)
+        fm <- glm.fit(x = X.wp, y = y, weights = w, etastart = etastart,
+                      offset = oi, family = fam, control = fitted$control)
         dev <- (fm$deviance - orig.dev)
         ## Likelihood root statistic
         lroot <- direction * sqrt(dev) 
         lroot.wp <- c(lroot.wp, lroot)
         par.wp <- c(par.wp, bi)    
         ## Update start values
-        start <- coef(fm)
+        etastart <- X[, !skip.wp, drop = FALSE] %*% fm$coefficients + oi
       } ## end 'while step <= max.steps and lroot <= lroot.max'
       ## test that lroot.max is reached (e.g. max.steps not reached)
       if(abs(lroot) < lroot.max)
         warning("profile may be unreliable for '", wp.name,
                 "' because lroot.max was not reached for ",
-                wb, c(" down", " up")[(direction + 1)/2 + 1])
+                wp, c(" down", " up")[(direction + 1)/2 + 1])
       ## test that enough steps are taken
       if(step <= step.warn)
         warning("profile may be unreliable for '", wp.name,
@@ -109,9 +112,9 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
       warning("likelihood is not monotonically decreasing from maximum,\n",
               "  so profile may be unreliable for ", wp.name)
   } ## end 'for wp in which.par'
-  val <- structure(prof.list, original.fit = object, summary =
-    summary(object), name.originalfit = name.object, call.originalfit =
-    call.object)  
+  val <- structure(prof.list, original.fit = fitted, summary =
+    summary(fitted), name.originalfit = name.fitted, call.originalfit =
+    call.fitted)  
   class(val) <- c('profile.glm')
   return(val)
 }
@@ -140,7 +143,7 @@ plot.profile.glm <- function(x, which.par, likelihood = TRUE,
   if(any(is.na(which.par)))
     stop("Invalid parameter argument(s) in 'which.par'")
   stopifnot(length(which.par) > 0)
-  ## Match extraction from original glm object
+  ## Match extraction from original 'fitted' glm
   orig.fit <- attr(x, 'original.fit')
   name.originalfit <- attr(x, 'name.originalfit')
   call.originalfit <- attr(x, 'call.originalfit') 
@@ -221,7 +224,7 @@ plot.profile.glm <- function(x, which.par, likelihood = TRUE,
           col='steelblue')
       }
       lines(spline.wp$x, spline.wp$y)
-      title(paste("\nProfile likelihood of parameter estimates from object '",
+      title(paste("\nProfile likelihood of parameter estimates from '",
       name.originalfit, "'", sep=""), outer=T)
       if(nrows > 3) {
         devAskNewPage(TRUE)

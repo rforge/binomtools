@@ -15,7 +15,7 @@ resBin(object, type = c("deviance", "aLik", "eLik", "pearson"))
   from \code{\link[stats]{rstandard}}. The approximated likelihood
   residuals (\code{aLik}) are from \code{\link[stats]{rstudent}} and the
   exact likelihood residuals (\code{eLik}) from
-  \code{\link[BinomTools]{exLikResid}}. The \code{pearson} residuals are
+  \code{\link[binomTools]{exLikResid}}. The \code{pearson} residuals are
   standardized pearson residuals and are calculated dividing the pearson
   residuals (obtained from \code{\link[stats]{residuals}}) by
   \eqn{sqrt(1-h_i)} (\eqn{h_i} can be extracted with

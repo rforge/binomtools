@@ -43,7 +43,7 @@ exLikResid(object)
 }
 \author{Merete K Hansen}
 \seealso{
-  \code{\link[stats]{rstudent}}, \code{\link[BinomTools]{resBin}}
+  \code{\link[stats]{rstudent}}, \code{\link[binomTools]{resBin}}
 }
 \examples{
 data(beetles)

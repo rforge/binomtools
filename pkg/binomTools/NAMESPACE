@@ -1,5 +1,5 @@
 export(halfnorm, exLikResid, resBin, empLogit, group, HLtest, Rsq,
-       X2GOFtest, profile)
+       X2GOFtest)
 
 # S3method(method, class)
 S3method(group, glm)
