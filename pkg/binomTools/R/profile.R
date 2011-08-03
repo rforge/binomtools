@@ -1,6 +1,4 @@
-## OBS - change function name to profile
-
-profBin <- function(object, which.par, alpha = 0.005, max.steps = 50,
+profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
                nsteps = 8, step.warn = 5, trace = F, ...)
 {
   ## Match and test input arguments
@@ -114,18 +112,13 @@ profBin <- function(object, which.par, alpha = 0.005, max.steps = 50,
   val <- structure(prof.list, original.fit = object, summary =
     summary(object), name.originalfit = name.object, call.originalfit =
     call.object)  
-  class(val) <- c('profBin.glm')
+  class(val) <- c('profile.glm')
   return(val)
 }
 
 
 
-#######################
-## Plot of profile likelihood
-#######################
-
-## OBS - change function name to plot.profile
-aa <- function(x, which.par, statistic = c("likelihood", "lroot"),
+plot.profile.glm <- function(x, which.par, statistic = c("likelihood", "lroot"),
                              relative = TRUE, log = FALSE, approx = TRUE,
                              conf.int = TRUE, level = 0.95, n = 100, 
                              fig = TRUE, ylim = NULL, ...)
