@@ -11,6 +11,7 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
   stopifnot(is.numeric(alpha) && length(alpha) == 1 &&
             alpha > 0 && alpha < 1)
   stopifnot(round(max.steps) > round(nsteps))
+  stopifnot(round(nsteps) > round(step.warn))
   stopifnot(round(nsteps) > 0 && round(step.warn) >= 0)
   max.steps <- round(max.steps)
   nsteps <- round(nsteps)
@@ -118,8 +119,8 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
 
 
 
-plot.profile.glm <- function(x, which.par, statistic = c("likelihood", "lroot"),
-                             relative = TRUE, log = FALSE, approx = TRUE,
+plot.profile.glm <- function(x, which.par, likelihood = TRUE,
+                             log = FALSE, relative = TRUE, approx = TRUE,
                              conf.int = TRUE, level = 0.95, n = 100, 
                              fig = TRUE, ylim = NULL, ...)
 {  
@@ -140,7 +141,6 @@ plot.profile.glm <- function(x, which.par, statistic = c("likelihood", "lroot"),
   if(any(is.na(which.par)))
     stop("Invalid parameter argument(s) in 'which.par'")
   stopifnot(length(which.par) > 0)
-  statistic <- match.arg(statistic)
   ## Match extraction from original glm object
   orig.fit <- attr(x, 'original.fit')
   name.originalfit <- attr(x, 'name.originalfit')
@@ -180,42 +180,42 @@ plot.profile.glm <- function(x, which.par, statistic = c("likelihood", "lroot"),
       spline.approx.wp <- spline(par.wp, approx.wp, n = n)
     }
     if(conf.int) cutoff.wp <- qnorm((1-level)/2, lower.tail = F) 
-    if(statistic == 'lroot') {
+    if(!likelihood) { ## lroot
       ylab <- "Profile likelihood root"
       if(conf.int) cutoff.wp <- c(-1, 1) %o% cutoff.wp
-    } ## end 'if statistic is lroot'
-    else { ## if statistic is likelihood
+    } ## end 'if !likelihood'
+    else { ## if likelihood == TRUE
       spline.wp$y <- -spline.wp$y^2/2
       if(approx) spline.approx.wp$y <- -spline.approx.wp$y^2/2
       if(conf.int) cutoff.wp <- -cutoff.wp^2/2
-      if(relative && log)
+      if(log && relative)
         ylab <- "Rel. profile log-likelihood"
-      if(relative && !log) {
+      if(!log && relative) {
         ylab <- "Rel. profile likelihood"
         spline.wp$y <- exp(spline.wp$y)
         if(approx) spline.approx.wp$y <- exp(spline.approx.wp$y)
         if(conf.int) cutoff.wp <- exp(cutoff.wp)
       }
-      if(!relative && log) {
+      if(log && !relative) {
         ylab <- "Profile log-likelihood"
         spline.wp$y <- spline.wp$y + lLik
         if(approx) spline.approx.wp$y <- spline.approx.wp$y + lLik
         if(conf.int) cutoff.wp <- cutoff.wp + lLik
       }
-      if(!relative && !log) {
+      if(!log && !relative) {
         ylab <- "Profile likelihood"
         spline.wp$y <- exp(spline.wp$y + lLik)
         if(approx) spline.approx.wp$y <- exp(spline.approx.wp$y + lLik)
         if(conf.int) cutoff.wp <- exp(cutoff.wp + lLik)
       }
-    } ## end 'if statistic is likelihood'
+    } ## end 'if likelihood == TRUE'
     res.list[[wp.name]]$spline.vals <- spline.wp
     if(approx) res.list[[wp.name]]$spline.approx.vals <- spline.approx.wp 
     if(conf.int) res.list[[wp.name]]$cutoff <- cutoff.wp 
     if(fig) {
       plot(spline.wp$x, spline.wp$y, type='n', xlab=wp.name,
       ylab=ylab, col='black', ylim = ylim)
-      if(statistic=='lroot') points(b0[wp.name], 0, pch=18)
+      if(!likelihood) points(b0[wp.name], 0, pch=18)
       if(conf.int) abline(h = cutoff.wp)
       if(approx) {
         lines(spline.approx.wp$x, spline.approx.wp$y, lty=2,
