@@ -11,7 +11,6 @@ profile.glm <- function(object, which.par, alpha = 0.005, max.steps = 50,
   stopifnot(is.numeric(alpha) && length(alpha) == 1 &&
             alpha > 0 && alpha < 1)
   stopifnot(round(max.steps) > round(nsteps))
-  stopifnot(round(nsteps) > round(step.warn))
   stopifnot(round(nsteps) > 0 && round(step.warn) >= 0)
   max.steps <- round(max.steps)
   nsteps <- round(nsteps)
