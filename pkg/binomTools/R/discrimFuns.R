@@ -1,12 +1,11 @@
 ##################################################################
 ### Rune Haubo Bojesen Christensen, rhbc@imm.dtu.dk
-### May 5th, 2009
+### August 5th, 2011
 ###
 ### This script contains R-functions to estimate the performance
-### measures suggested by Tue Tjur in "Coefficients of determination in
+### measures described in Tjur T. (2009). Coefficients of determination in
 ### logistic regression models - a new proposal: The coefficient of
-### discrimination"; a manuscript currently under consideration for
-### publication in The American Statistician.
+### discrimination. The American Statistician, vol 63, no. 4: 366-372
 ### (http://staff.cbs.dk/tuetjur/R2.pdf)
 ###
 ### As an example copy the following commands to the R-promt:
@@ -45,9 +44,9 @@ Rsq <- function(object, ...) {
   UseMethod("Rsq")
 }
 
-eAUC <- function(object, ...) {
-  UseMethod("eAUC")
-}
+##eAUC <- function(object, ...) {
+##  UseMethod("eAUC")
+##}
 
 HLtest <- function(object, ...) {
   UseMethod("HLtest")
@@ -155,16 +154,16 @@ plot.Rsq <- function(x, which=c("hist", "ecdf", "ROC"), ...) {
     invisible(x)
 }
 
-eAUC.Rsq <- function(x, ...) {
-    pi0 <- with(x, piHat[Y == 0])
-    pi1 <- with(x, piHat[Y == 1])
-    F0 <- ecdf(pi0)
-    F1 <- ecdf(pi1)
-    piVals <- seq(0, 1, length=1000)
-    F0inv <- approxfun(piVals, F0(1 - piVals), method = "constant")
-    intFn <- function(x) 1 - F1(F0inv(1 - x))
-    integrate(f = intFn, lower = 0, upper = 1)
-}
+##eAUC.Rsq <- function(x, ...) {
+##    pi0 <- with(x, piHat[Y == 0])
+##   pi1 <- with(x, piHat[Y == 1])
+##    F0 <- ecdf(pi0)
+##    F1 <- ecdf(pi1)
+##    piVals <- seq(0, 1, length=1000)
+##    F0inv <- approxfun(piVals, F0(1 - piVals), method = "constant")
+##    intFn <- function(x) 1 - F1(F0inv(1 - x))
+##    integrate(f = intFn, lower = 0, upper = 1)
+##}
 
 HLtest.Rsq <- function(object, method=c("deciles", "fixed"), decile.type=8,
                        ...) {

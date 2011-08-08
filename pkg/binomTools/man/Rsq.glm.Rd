@@ -67,7 +67,7 @@
 \references{
   Tjur, T. (2009) Coefficients of determination in
   logistic regression models - a new proposal: The coefficient of
-  discrimination. The American Statistician, 63(4), 366-372.
+  discrimination. \emph{The American Statistician}, \bold{63}(4), 366-372.
 }
 \author{
   Rune Haubo B Christensen
@@ -78,7 +78,7 @@
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 \seealso{
-  A \code{HLtest} (Hosmer and Lemeshow test)
+  A \code{\link[binomTools]{HLtest}} (Hosmer and Lemeshow test)
   method exists for \code{Rsq} objects.
 }
 \examples{

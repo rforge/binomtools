@@ -22,7 +22,7 @@
     should the new glm-model be evaluated?
   }
   \item{ind}{
-    an indicator for which rows to keep(?). If this is no specified the
+    an indicator for which rows to keep(?). If this is not specified the
     grouping structure is based on the covariate structure in the
     model.
   }
@@ -70,8 +70,11 @@
 %% ...
 }
 \references{
-  Collett (2001)
-  Venables and Ripley (2002)
+  Collett, D. (2003) \emph{Modelling binary data}. Second
+  edition. Chapman & Hall/CRC.
+  
+  Venables, W.N. and Ripley, B.D. (2002) \emph{Modern Applied Statistics
+  with S}. Fourth Edition. Springer 
 %% ~put references to the literature/web site here ~
 }
 \author{

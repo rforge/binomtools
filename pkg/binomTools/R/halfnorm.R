@@ -1,7 +1,7 @@
 ### Halfnorm points and optional envelope returned as a list
 halfnormList <- function(object, resType, env, nsim)
 {
-    res <- resBin(object, type=resType)
+    res <- Residuals(object, type=resType)
 
     ## Absolute values of residuals in ascending order plotted against Phi^(-1){(i+n-1/8)/(2n+1/2)}
     no.res <- length(object$resid)
@@ -34,7 +34,7 @@ halfnormEnv <- function(object, resType, nsim)
         suc <- rbinom(dim(object$data)[1], groupSize, object$fitted)
         simData$YY <- cbind(suc, groupSize-suc)
         simObj <- eval(call)
-        envRes <- sort(abs(resBin(simObj, type=resType)))
+        envRes <- sort(abs(Residuals(simObj, type=resType)))
         names(envRes) <- NULL
         if(is.null(unlist(envList))) envList <- list(minValues=envRes,
             meanValues=envRes/nsim, maxValues=envRes)  
@@ -96,9 +96,11 @@ idHalfplot <- function(list, n, env, pch=NULL, tolerance=0.25, ...)
 }
 
 ### Final halfnorm function
-halfnorm <- function(object, resType=c('deviance', 'aLik', 'eLik',
-                     'pearson'), env=T, nsim = 20, plot=T,
-                     identify=F, n=2)  {  
+halfnorm <- function(object, resType=c("approx.deletion",
+                     "exact.deletion", "standard.deviance",
+                     "standard.pearson", "deviance", "pearson",
+                     "working", "response", "partial"), env=T, nsim =
+                     20, plot=T, identify=F, n=2)  {  
 
     resType <- match.arg(resType)
     List <- halfnormList(object, resType, env, nsim)

@@ -8,20 +8,22 @@
   outliers 
 }
 \usage{
-halfnorm(object, resType = c("deviance", "aLik", "eLik", "pearson"),
-env = T, nsim = 20, plot = T, identify = F, n = 2)  
+halfnorm(object, resType = c("approx.deletion", "exact.deletion",
+         "standard.deviance", "standard.pearson", "deviance",
+         "pearson", "working", "response", "partial"), env = T,
+         nsim = 20, plot = T, identify = F, n = 2)   
 }
 \arguments{
   \item{object}{An object of class \code{glm} with a binomial family}
-  \item{resType}{The type of residuals used in the plot}
+  \item{resType}{The type of residual used in the plot}
   \item{env}{Logical for whether envelopes are simulated}
   \item{nsim}{Number of simulations used for the envelopes}
   \item{plot}{Logical for whether the points should be plotted. If
     \code{plot = F} a list is returned} 
   \item{identify}{Logical for whether it should be possible to identify
     points interactively. Ignored if \code{plot = F}}
-  \item{n}{How many points should be identified. Only meaningful if
-    \code{identify = T}}
+  \item{n}{How many points should be identified. Ignored if
+    \code{identify = F}}
 }
 \details{
   Absolute values of the residuals are used in a half normal plot that
@@ -33,15 +35,8 @@ env = T, nsim = 20, plot = T, identify = F, n = 2)
   optional simulated envelopes are likely to contain the absolute
   residuals. 
 
-  The \code{deviance} residuals are the standardized deviance residuals
-  from \code{\link[stats]{rstandard}}. The approximated likelihood
-  residuals (\code{aLik}) are from \code{\link[stats]{rstudent}} and the
-  exact likelihood residuals (\code{eLik}) from
-  \code{\link[binomTools]{exLikResid}}. The \code{pearson} residuals are
-  standardized pearson residuals and are calculated dividing the pearson
-  residuals (obtained from \code{\link[stats]{residuals}}) by
-  \eqn{sqrt(1-h_i)}, where \eqn{h_i} can be extracted with
-  \code{\link[stats]{hatvalues}}. 
+  The different types of residuals are described in
+  \code{\link[binomTools]{Residuals}} 
 }
 \value{
   If \code{plot = T} a plot is produced. Otherwise a list of the
@@ -57,8 +52,7 @@ env = T, nsim = 20, plot = T, identify = F, n = 2)
 }
 \author{Merete K Hansen}
 \seealso{
-  \code{\link[binomTools]{exLikResid}},
-  \code{\link[binomTools]{resBin}}, \code{\link[graphics]{identify}}
+  \code{\link[binomTools]{Residuals}}, \code{\link[graphics]{identify}}
 }
 \examples{
 ## Halfnormal plot with simulated envelopes
@@ -67,11 +61,9 @@ beetles.glm <- glm(cbind(y, n-y) ~ conc, family=binomial, data=beetles)
 halfnorm(beetles.glm, resType='pearson')
 
 \dontrun{
-## Not run: 
 ## Halfnormal plot with simulated envelopes
 ## Two points are interactively identified when they are selected with the mouse
 halfnorm(beetles.glm, resType='deviance', identify = T, n = 2)
-## End(Not run)
 }
 }
 \keyword{ dplot }
