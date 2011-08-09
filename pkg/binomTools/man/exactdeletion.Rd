@@ -1,11 +1,11 @@
-\name{exLikResid}
-\alias{exLikResid}
-\title{Exact likelihood residuals}
+\name{exact.deletion}
+\alias{exact.deletion}
+\title{Exact deletion residuals}
 \description{
   Function to derive exact values of deletion (leave-one-out)
-  residuals for logistic regression models}
+  residuals for binomial regression models}
 \usage{
-exLikResid(object)
+exact.deletion(object)
 }
 \arguments{
   \item{object}{An object of class \code{glm} with a binomial family}
@@ -26,8 +26,7 @@ exLikResid(object)
   likelihood residuals, studentized residuals, externally studentized
   residuals, deleted studentized residuals and jack-knife
   residuals. Conversely, some of these terms refer to different types of
-  residuals and, accordingly, care must be exercised in order to avoid
-  confusion of the different residual types.   
+  residuals   
 }
 \value{A vector with exact deletion residuals}
 \references{
@@ -43,11 +42,11 @@ exLikResid(object)
 }
 \author{Merete K Hansen}
 \seealso{
-  \code{\link[stats]{rstudent}}, \code{\link[binomTools]{resBin}}
+  \code{\link[binomTools]{Residuals}}, \code{\link[stats]{rstudent}}
 }
 \examples{
 data(beetles)
 beetles.glm <- glm(cbind(y, n-y) ~ log(conc), family=binomial, data=beetles)
-exLikResid(beetles.glm)
+exact.deletion(beetles.glm)
 }
 \keyword{ models }
