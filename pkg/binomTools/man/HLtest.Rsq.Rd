@@ -82,9 +82,6 @@
   \item{z.score}{
     the standardized z-score for the goodness-of-fit test
   }
-  \item{A}{
-    A
-  }
   \item{RSS}{
     the residual sums of squares term
   }
@@ -98,9 +95,9 @@
 %% ...
 }
 \references{
-  Hosmer et al (????) ...
-
-  Some Germans that I don't remember right now.
+  Hosmer, D.W. and Lemeshow, S. (1980). Goodness of fit tests for the
+  multiple logistic regression model. \emph{Communications in Statistics
+  - Theory and Methods}, \bold{A9}(10), p. 1043-1069. 
 }
 \author{
   Rune Haubo B Christensen

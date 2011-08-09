@@ -247,7 +247,7 @@ X2GOFtest.Rsq <- function(x, ...) {
     z <- (X2 - obj$df.residual)/sqrt(A + RSS)
     p.value <- 2 * pnorm(abs(z), lower=FALSE)
 
-    res <- list(p.value=p.value, z.score=z, A=A, RSS=RSS, X2=X2)
+    res <- list(p.value=p.value, z.score=z, RSS=RSS, X2=X2)
     class(res) <- "X2GOFtest.Rsq"
     res
 }

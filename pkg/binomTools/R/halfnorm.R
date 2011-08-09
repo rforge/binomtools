@@ -23,16 +23,16 @@ halfnormEnv <- function(object, resType, nsim)
     if(!is.null(model.weights(mf))) mw <- model.weights(mf)
     else mw <- rep(1, nrow(mf))
     start <- coef(object)
-    call <- update(object, formula=YY ~ ., data = simData, weights =
+    call <- update(object, formula=.YY ~ ., data = simData, weights =
     mw, evaluate = F, start=start)
 
     ## Simulation of data
-    simData <- object$model
+    simData <- object$data
     simData$mw <- mw
     envList <- vector('list', 3)
     for(i in 1:nsim) {
         suc <- rbinom(dim(object$data)[1], groupSize, object$fitted)
-        simData$YY <- cbind(suc, groupSize-suc)
+        simData$.YY <- cbind(suc, groupSize-suc)
         simObj <- eval(call)
         envRes <- sort(abs(Residuals(simObj, type=resType)))
         names(envRes) <- NULL
@@ -56,11 +56,15 @@ halfplot <- function(list, env, type=NULL, ...)
     maxEnv <- list$EnvList$maxValues
     resType <- list$resType
 
-    resType <- switch(resType, deviance='deviance',
-                      aLik='approximated likelihood', eLik='exact likelihood',
-                      pearson='Pearson') 
+    resType <- switch(resType, approx.deletion =
+                      "approx. deletion", exact.deletion =
+                      "exact deletion", standard.deviance =
+                      "standardized. deviance", standard.pearson =
+                      "standardized Pearson", deviance = "deviance", pearson =
+                      "Pearson", working = "working", response =
+                      "response", partial = "partial") 
 
-    if(env) ylim <- c(0, max(maxEnv))
+    if(env) ylim <- c(0, max(c(maxEnv, y)))
     else ylim <- c(0, max(y))
 
     oldPar <- par(mar=c(5, 5.5, 4, 2) + 0.1)
@@ -68,7 +72,7 @@ halfplot <- function(list, env, type=NULL, ...)
     plot(x, y, pch=20, cex.axis=0.8, las=1, tcl=-0.3, mgp=c(3, 0.6, 0),
         ylim=ylim,
         xlab='Expected value of half-normal order statistic', 
-        ylab=paste('Absolute value of standardized \n', resType, 'residuals'), 
+        ylab=paste('Absolute value of \n', resType, 'residuals'), 
         main='Half-normal plot of residuals', type=type, ...)
     if(env) {
         lines(x, minEnv, lty=3)
@@ -111,4 +115,5 @@ halfnorm <- function(object, resType=c("approx.deletion",
             idHalfplot(List, n, env)}
     else List
 }
+
 

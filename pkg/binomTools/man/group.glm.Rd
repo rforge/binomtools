@@ -22,7 +22,7 @@
     should the new glm-model be evaluated?
   }
   \item{ind}{
-    an indicator for which rows to keep(?). If this is not specified the
+    an indicator for which rows to keep. If this is not specified the
     grouping structure is based on the covariate structure in the
     model.
   }
