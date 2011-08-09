@@ -1,10 +1,7 @@
-########################
-### Exact likelihood residuals - leave one out
-########################
-exLikResid <- function(object) {
+exact.deletion <- function(object) {
 
   if(is.null(object$model)) 
-    stop('glm object has to be fitted with \'model=TRUE\'')
+    stop("glm object has to be fitted with \'model=TRUE\'")
 
   start <- coef(object) # start values to be used in model fitting
   fit <- object$fitted
@@ -26,31 +23,31 @@ exLikResid <- function(object) {
   object$model[,1] <- resp*mw		### new response including the weights
   newCall <- update(object, subset=-i, start=start, evaluate=F)
 
-  residLik <- rep(0, 5)
+  residLik <- rep(0, N)
   for(i in 1:N) {
     objLeave1out <- eval(newCall)
     devResidLeave1out <- deviance(objLeave1out)
     residLik[i] <- sign(y[i]-fit[i]) * sqrt(devResidAbs-devResidLeave1out) 
   }
 
+  names(residLik) <- 1:N
   residLik
 }
 
 
-
-########################
-### Function to calculate standardised pearson, deviance and likelihood residuals
-########################
-# tjek om residualer er rigtige
-
-resBin <- function(object, type=c('deviance', 'aLik','eLik','pearson')) { 
-
+Residuals <- function(object, type=c("approx.deletion",
+                      "exact.deletion", "standard.deviance", "standard.pearson", 
+                      "deviance", "pearson", "working", "response", "partial"))
+{  
   type <- match.arg(type)
-  h <- hatvalues(object)
 
   res <- switch(type, 
-    deviance = rstandard(object), aLik = rstudent(object), eLik = exLikResid(object), 
-    pearson = resid(object, type='pearson')/sqrt(1-h))
+    approx.deletion = rstudent(object), exact.deletion =
+    exact.deletion(object), standard.deviance = rstandard(object),
+    standard.pearson = rstandard(object, type="pearson"), deviance =
+    residuals(object), pearson = residuals(object, type="pearson"),
+    working = residuals(object, type="working"), response =
+    residuals(object, type="response"), partial = residuals(object, type="partial"))
 
   return(res)
 }
