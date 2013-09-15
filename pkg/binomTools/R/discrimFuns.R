@@ -70,15 +70,15 @@ Rsq.glm <- function(object, ...) {
     N <- length(y)
     wt <- object$prior.weights
     muHat <- object$fitted.values
-    resp <- cbind(suc = y*wt , n = wt)
+    resp <- cbind(suc = round(y*wt) , n = round(wt))
     Y <- apply(resp, 1,
-               function(x) c(rep(1, x[1]), rep(0, x[2]-x[1])))
+               function(x) c(rep(1, round(x[1])), rep(0, round(x[2]-x[1]))))
     if(is.list(Y))
         Y <- unlist(Y)
     else
         Y <- c(Y)
     piHat <- c(apply(cbind(muHat, wt), 1,
-                     function(x) rep(x[1], x[2])))
+                     function(x) rep(x[1], round(x[2]))))
     if(is.list(piHat))
         piHat <- unlist(piHat)
     else
@@ -199,7 +199,7 @@ HLtest.Rsq <- function(object, method=c("deciles", "fixed"), decile.type=8,
     E[is.na(E)] <- 0
     resid[is.na(resid)] <- 0
     X2 <- sum(resid^2, na.rm=TRUE)
-    p.value <- pchisq(X2, 10-2, lower=FALSE)
+    p.value <- pchisq(X2, 10-2, lower.tail=FALSE)
     res <- list(expected=E, observed=O, resid=resid, X2=X2,
                 p.value=p.value, method=method)
     class(res) <- "HLtest.Rsq"
@@ -245,7 +245,7 @@ X2GOFtest.Rsq <- function(x, ...) {
     RSS <- sum(resid(lm(form, data=dat, weights=vJ))^2)
     A <- 2*(length(piHatJ) - sum(1/wt))
     z <- (X2 - obj$df.residual)/sqrt(A + RSS)
-    p.value <- 2 * pnorm(abs(z), lower=FALSE)
+    p.value <- 2 * pnorm(abs(z), lower.tail=FALSE)
 
     res <- list(p.value=p.value, z.score=z, RSS=RSS, X2=X2)
     class(res) <- "X2GOFtest.Rsq"
