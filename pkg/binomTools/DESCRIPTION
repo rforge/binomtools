@@ -4,7 +4,7 @@ Title: Performing diagnostics on binomial regression models
 Version: 1.0-2
 Date: 2013-09-15
 Author: Rune Haubo B Christensen and Merete K Hansen
-Maintainer: Merete K Hansen <mkh@imm.dtu.dk>
+Maintainer: Merete K Hansen <mkha@dtu.dk>
 Description: This package provides a range of
   diagnostic methods for binomial regression models.
 License: GPL (>= 3)
